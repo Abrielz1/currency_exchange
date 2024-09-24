@@ -80,38 +80,22 @@ public class CurrencyService {
             inBDCurrency.setLetterISOCode(currency.getLetterIsoCode());
         }
 
-        return CURRENCY_MAPPER.convertToDto(repository.saveAndFlush(inBDCurrency));
-    }
+        Currency toBd = repository.saveAndFlush(inBDCurrency);
 
-    public CurrencyDto update(Currency currency) {
-
-        return this.update(CURRENCY_MAPPER.convertToDto(currency));
+        return CURRENCY_MAPPER.convertToDto(toBd);
     }
 
     @Transactional
     public CurrencyDto create(CurrencyDto dto) {
         log.info("CurrencyService method create executed");
+        Currency toBd = repository.saveAndFlush(mapper.convertToEntity(dto));
 
-        return  mapper.convertToDto(repository.save(mapper.convertToEntity(dto)));
-    }
-//
-//    public CurrencyDto create(Currency currency) {
-//        log.info("CurrencyService method create executed");
-//
-//        return  this.create( CURRENCY_MAPPER.convertToDto(currency));
-//    }
-
-    public Optional<Currency> checkRecordInBD(Currency currency) {
-
-        return repository.findByCurrencyNameAndIsoCodeAndCharCode(
-                currency.getName(),
-                currency.getIsoNumCode(),
-                currency.getLetterISOCode());
+        return  mapper.convertToDto(toBd);
     }
 
     public Optional<Currency> checkRecordInBD(CurrencyDto currencyDto) {
         Currency currency = Currency.builder()
-                .id(null)
+                //.id(null)
                 .name(currencyDto.getName())
                 .nominal(currencyDto.getNominal())
                 .value(currencyDto.getValue())

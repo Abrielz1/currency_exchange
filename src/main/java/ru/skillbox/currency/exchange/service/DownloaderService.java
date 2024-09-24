@@ -3,14 +3,12 @@ package ru.skillbox.currency.exchange.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.skillbox.currency.exchange.dto.CurrencyDto;
-import ru.skillbox.currency.exchange.entity.Currency;
-import ru.skillbox.currency.exchange.mapper.CurrencyMapper;
+import ru.skillbox.currency.exchange.dto.CurrencyDto;;
 import ru.skillbox.currency.exchange.service.util.CurrencyDetailsXml;
 import ru.skillbox.currency.exchange.service.util.CurrencyXml;
-import ru.skillbox.currency.exchange.service.util.XMLManipulator;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -19,17 +17,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import static ru.skillbox.currency.exchange.mapper.CurrencyMapper.CURRENCY_MAPPER;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DownloaderService {
-
-    private final CurrencyMapper mapper;
-
-    private final XMLManipulator xmlManipulator;
 
     private final CurrencyService currencyService;
 
@@ -64,8 +56,9 @@ public class DownloaderService {
 
     private CurrencyXml unmarshal() throws JAXBException, FileNotFoundException {
         JAXBContext context = JAXBContext.newInstance(CurrencyXml.class);
+        Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
 
-        return (CurrencyXml) context.createUnmarshaller().unmarshal(new FileReader(PATH_TO_FILE));
+        return (CurrencyXml) jaxbUnmarshaller.unmarshal(new FileReader(PATH_TO_FILE));
     }
 
     public List<CurrencyDto> mapperToCurrencyDtoList(CurrencyXml xml) {
@@ -79,8 +72,10 @@ public class DownloaderService {
 
     private CurrencyDto mapperToCurrencyDto(CurrencyDetailsXml currencyDetailsXml) {
 
-        return new CurrencyDto()
+        new CurrencyDto();
+        return CurrencyDto
                 .builder()
+              //  .id(0L)
                 .name(currencyDetailsXml.getName())
                 .nominal(currencyDetailsXml.getNominal())
                 .value(currencyDetailsXml.getValue())
@@ -88,8 +83,6 @@ public class DownloaderService {
                 .letterIsoCode(currencyDetailsXml.getLetterISOCode())
                 .build();
     }
-
-
 
     private List<CurrencyDto> checkCurrenciesInDB(List<CurrencyDto> listToUpdateCurrenciesInXML) {
         List<CurrencyDto> result = new ArrayList<>();
@@ -104,5 +97,3 @@ public class DownloaderService {
         return result;
     }
 }
-
-//result.add(CURRENCY_MAPPER.convertToDto(currencyService.checkRecordInBD(currency)));

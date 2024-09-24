@@ -15,12 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.currency.exchange.dto.CurrencyDto;
 import ru.skillbox.currency.exchange.service.DownloaderService;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -61,6 +57,7 @@ public class CurrencyActualValueDownloader {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 

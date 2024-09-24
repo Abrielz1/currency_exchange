@@ -18,6 +18,7 @@ import java.util.Objects;
 public class CurrencyXml {
 
     private String date;
+
     private List<CurrencyDetailsXml> valutes;
 
 

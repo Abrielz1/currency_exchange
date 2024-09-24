@@ -44,7 +44,7 @@ public class Currency {
     private Long isoNumCode;
 
     @Column(name = "letter_iso_code")
-    private String letterISOCode;
+    private String letterIsoCode;
 
     @Override
     public final boolean equals(Object o) {

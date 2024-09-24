@@ -2,26 +2,30 @@ package ru.skillbox.currency.exchange.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
-import ru.skillbox.currency.exchange.dto.CurrencyDto;;
+import ru.skillbox.currency.exchange.dto.CurrencyDto;
+import ru.skillbox.currency.exchange.entity.Currency;
+import ru.skillbox.currency.exchange.mapper.CurrencyMapperManual;
+import ru.skillbox.currency.exchange.repository.CurrencyRepository;
 import ru.skillbox.currency.exchange.service.util.CurrencyDetailsXml;
 import ru.skillbox.currency.exchange.service.util.CurrencyXml;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DownloaderService {
+    private final CurrencyRepository currencyRepository;
 
     private final CurrencyService currencyService;
 
@@ -47,9 +51,13 @@ public class DownloaderService {
 
     private void byteaArrayToFile(byte[] bytesArray) {
 
-        try {
-            Files.write(Paths.get(PATH_TO_FILE), Objects.requireNonNull(bytesArray));
-        } catch (IOException e) {
+        System.out.println("myArray " + new String(bytesArray, StandardCharsets.UTF_8) + " myArray!");
+
+       try
+           (FileOutputStream fos = new FileOutputStream(PATH_TO_FILE)) {
+           fos.write(bytesArray, 0, bytesArray.length);
+        }
+            catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -75,7 +83,6 @@ public class DownloaderService {
         new CurrencyDto();
         return CurrencyDto
                 .builder()
-              //  .id(0L)
                 .name(currencyDetailsXml.getName())
                 .nominal(currencyDetailsXml.getNominal())
                 .value(currencyDetailsXml.getValue())
@@ -85,9 +92,12 @@ public class DownloaderService {
     }
 
     private List<CurrencyDto> checkCurrenciesInDB(List<CurrencyDto> listToUpdateCurrenciesInXML) {
+
         List<CurrencyDto> result = new ArrayList<>();
         for (CurrencyDto currency : listToUpdateCurrenciesInXML) {
-            if (currencyService.checkRecordInBD(currency).isPresent()) {
+            Currency currencyToCheck = CurrencyMapperManual.toEntity(currency);
+            if (currencyRepository.exists(Example.of(currencyToCheck))) {
+
                 result.add(currencyService.update(currency));
             } else {
                 result.add(currencyService.create(currency));

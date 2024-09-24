@@ -54,6 +54,7 @@ public class CurrencyActualValueDownloader {
                             entity, byte[].class);
 
             return response.getBody();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

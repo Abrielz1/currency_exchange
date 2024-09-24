@@ -9,6 +9,7 @@ import ru.skillbox.currency.exchange.dto.CurrencyDto;
 import ru.skillbox.currency.exchange.dto.CurrencyShortDto;
 import ru.skillbox.currency.exchange.entity.Currency;
 import ru.skillbox.currency.exchange.mapper.CurrencyMapper;
+import ru.skillbox.currency.exchange.mapper.CurrencyMapperManual;
 import ru.skillbox.currency.exchange.repository.CurrencyRepository;
 import java.util.List;
 import java.util.Optional;
@@ -52,12 +53,13 @@ public class CurrencyService {
         if (currency == null) {
             return null;
         }
+
         Currency inBDCurrency;
 
         if (this.checkRecordInBD(currency).isPresent()) {
             inBDCurrency = this.checkRecordInBD(currency).get();
         } else {
-            inBDCurrency = this.mapper.convertToEntity(currency);
+            inBDCurrency = CurrencyMapperManual.toEntity(currency);
         }
 
         if (currency.getName() != null) {
@@ -77,7 +79,7 @@ public class CurrencyService {
         }
 
         if (currency.getLetterIsoCode() != null) {
-            inBDCurrency.setLetterISOCode(currency.getLetterIsoCode());
+            inBDCurrency.setLetterIsoCode(currency.getLetterIsoCode());
         }
 
         Currency toBd = repository.saveAndFlush(inBDCurrency);
@@ -88,24 +90,24 @@ public class CurrencyService {
     @Transactional
     public CurrencyDto create(CurrencyDto dto) {
         log.info("CurrencyService method create executed");
-        Currency toBd = repository.saveAndFlush(mapper.convertToEntity(dto));
+        Currency toBd = repository.saveAndFlush(CurrencyMapperManual.toEntity(dto));
 
         return  mapper.convertToDto(toBd);
     }
 
     public Optional<Currency> checkRecordInBD(CurrencyDto currencyDto) {
+
         Currency currency = Currency.builder()
-                //.id(null)
                 .name(currencyDto.getName())
                 .nominal(currencyDto.getNominal())
                 .value(currencyDto.getValue())
                 .isoNumCode(currencyDto.getIsoNumCode())
-                .letterISOCode(currencyDto.getLetterIsoCode())
+                .letterIsoCode(currencyDto.getLetterIsoCode())
                 .build();
 
         return repository.findByCurrencyNameAndIsoCodeAndCharCode(
                         currency.getName(),
                         currency.getIsoNumCode(),
-                        currency.getLetterISOCode());
+                        currency.getLetterIsoCode());
     }
 }

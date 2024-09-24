@@ -1,10 +1,13 @@
 package ru.skillbox.currency.exchange.service.util;
 
+import lombok.NoArgsConstructor;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Objects;
 
+@NoArgsConstructor
 public class CurrencyDetailsXml {
 
     private String id;
@@ -18,9 +21,6 @@ public class CurrencyDetailsXml {
     private String letterISOCode;
 
     private Double value;
-
-    public CurrencyDetailsXml() {
-    }
 
     @XmlAttribute(name = "ID")
     public String getId() {

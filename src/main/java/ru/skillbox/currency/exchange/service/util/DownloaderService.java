@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import static ru.skillbox.currency.exchange.mapper.CurrencyMapper.CURRENCY_MAPPER;
 
 @Slf4j
@@ -111,6 +112,8 @@ public class DownloaderService {
     private List<CurrencyDto> checkCurrenciesInDB(List<CurrencyDto> listToUpdateCurrenciesInXML) {
 
         List<CurrencyDto> result = new ArrayList<>();
+        List<CurrencyDto> toSaveDtosToDBList = new ArrayList<>();
+
         for (CurrencyDto currency : listToUpdateCurrenciesInXML) {
             Currency currencyToCheck = CURRENCY_MAPPER.ToEntity(currency);
 
@@ -118,9 +121,19 @@ public class DownloaderService {
                 log.info("entity was in db, started update at" + " " + LocalDateTime.now());
                 result.add(currencyService.update(currency));
             } else {
-                log.info("entity was not in db, started create at" + " " + LocalDateTime.now());
-                result.add(currencyService.create(currency));
+                log.info("entity was not found in BD so it's moved to list for batch saving"
+                        + " " + LocalDateTime.now());
+                toSaveDtosToDBList.add(currency);
             }
+        }
+
+        if (!toSaveDtosToDBList.isEmpty()) {
+            log.info("entity was not in db, started create at" + " " + LocalDateTime.now());
+            currencyRepository.saveAllAndFlush(
+                    toSaveDtosToDBList.
+                    stream()
+                            .map(CURRENCY_MAPPER::ToEntity)
+                            .collect(Collectors.toList()));
         }
 
         return result;

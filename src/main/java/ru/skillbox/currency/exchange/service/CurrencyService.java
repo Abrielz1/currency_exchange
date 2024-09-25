@@ -10,6 +10,7 @@ import ru.skillbox.currency.exchange.dto.CurrencyShortDto;
 import ru.skillbox.currency.exchange.entity.Currency;
 import ru.skillbox.currency.exchange.mapper.CurrencyMapper;
 import ru.skillbox.currency.exchange.repository.CurrencyRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,43 +48,28 @@ public class CurrencyService {
         return value * currency.getValue();
     }
 
-    public CurrencyDto update(CurrencyDto currency) {
+    public Currency update(CurrencyDto currency) {
 
         if (currency == null) {
             return null;
         }
 
-        Currency inBDCurrency;
+        return this.updateEntity(currency);
+    }
 
-        if (this.checkRecordInBD(currency).isPresent()) {
-            inBDCurrency = this.checkRecordInBD(currency).get();
-        } else {
-            inBDCurrency = CURRENCY_MAPPER.ToEntity(currency);
+    public List<Currency> update(List<CurrencyDto> currency) {
+
+        List<CurrencyDto> updatedCurrencyList = new ArrayList<>();
+
+        for (CurrencyDto dto : updatedCurrencyList) {
+            Currency toUpdate = this.update(dto);
+            updatedCurrencyList.add(CURRENCY_MAPPER.convertToDto(toUpdate));
         }
 
-        if (currency.getName() != null) {
-            inBDCurrency.setName(currency.getName());
-        }
-
-        if (currency.getNominal() != null) {
-            inBDCurrency.setNominal(currency.getNominal());
-        }
-
-        if (currency.getValue() != null) {
-            inBDCurrency.setValue(currency.getValue());
-        }
-
-        if (currency.getIsoNumCode() != null) {
-            inBDCurrency.setIsoNumCode(currency.getIsoNumCode());
-        }
-
-        if (currency.getLetterIsoCode() != null) {
-            inBDCurrency.setLetterIsoCode(currency.getLetterIsoCode());
-        }
-
-        Currency toBd = repository.saveAndFlush(inBDCurrency);
-
-        return CURRENCY_MAPPER.convertToDto(toBd);
+        return updatedCurrencyList
+                .stream()
+                .map(CURRENCY_MAPPER::ToEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -108,5 +94,38 @@ public class CurrencyService {
                         currency.getName(),
                         currency.getIsoNumCode(),
                         currency.getLetterIsoCode());
+    }
+
+    private Currency updateEntity(CurrencyDto currency) {
+
+        Currency inBDCurrency;
+
+        if (this.checkRecordInBD(currency).isPresent()) {
+            inBDCurrency = this.checkRecordInBD(currency).get();
+        } else {
+            return null;
+        }
+
+        if (currency.getName() != null) {
+            inBDCurrency.setName(currency.getName());
+        }
+
+        if (currency.getNominal() != null) {
+            inBDCurrency.setNominal(currency.getNominal());
+        }
+
+        if (currency.getValue() != null) {
+            inBDCurrency.setValue(currency.getValue());
+        }
+
+        if (currency.getIsoNumCode() != null) {
+            inBDCurrency.setIsoNumCode(currency.getIsoNumCode());
+        }
+
+        if (currency.getLetterIsoCode() != null) {
+            inBDCurrency.setLetterIsoCode(currency.getLetterIsoCode());
+        }
+
+        return inBDCurrency;
     }
 }

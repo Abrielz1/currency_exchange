@@ -112,28 +112,37 @@ public class DownloaderService {
     private List<CurrencyDto> checkCurrenciesInDB(List<CurrencyDto> listToUpdateCurrenciesInXML) {
 
         List<CurrencyDto> result = new ArrayList<>();
-        List<CurrencyDto> toSaveDtosToDBList = new ArrayList<>();
+
+        List<Currency> listOfNewDtoToSave = new ArrayList<>();
+        List<CurrencyDto> listOfCurrenciesToUpdate = new ArrayList<>();
 
         for (CurrencyDto currency : listToUpdateCurrenciesInXML) {
             Currency currencyToCheck = CURRENCY_MAPPER.ToEntity(currency);
 
             if (currencyRepository.exists(Example.of(currencyToCheck))) {
-                log.info("entity was in db, started update at" + " " + LocalDateTime.now());
-                result.add(currencyService.update(currency));
+                log.info("entity was in DB, started update at" + " " + LocalDateTime.now());
+                listOfCurrenciesToUpdate.add(currency);
             } else {
-                log.info("entity was not found in BD so it's moved to list for batch saving"
+                log.info("entity was not found in DB so it's moved to list for batch saving"
                         + " " + LocalDateTime.now());
-                toSaveDtosToDBList.add(currency);
+                listOfNewDtoToSave.add(CURRENCY_MAPPER.ToEntity(currency));
             }
         }
 
-        if (!toSaveDtosToDBList.isEmpty()) {
+        if (!listOfCurrenciesToUpdate.isEmpty()) {
             log.info("entity was not in db, started create at" + " " + LocalDateTime.now());
-            currencyRepository.saveAllAndFlush(
-                    toSaveDtosToDBList.
-                    stream()
-                            .map(CURRENCY_MAPPER::ToEntity)
-                            .collect(Collectors.toList()));
+
+            result.addAll(this.mapperOfCurencyToDtoList(
+                    currencyRepository.saveAllAndFlush(
+                            currencyService.update(listOfCurrenciesToUpdate))));
+        }
+
+        if (!listOfNewDtoToSave.isEmpty()) {
+            log.info("entity was not in db, started create at" + " " + LocalDateTime.now());
+
+            result.addAll(
+                    this.mapperOfCurencyToDtoList(
+                            currencyRepository.saveAllAndFlush(listOfNewDtoToSave)));
         }
 
         return result;
@@ -167,10 +176,17 @@ public class DownloaderService {
         try {
 
             return httpClient.send(request, HttpResponse.BodyHandlers.ofString()).body();
-        } catch (InterruptedException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
         return "";
+    }
+
+    private List<CurrencyDto> mapperOfCurencyToDtoList(List<Currency> currencies) {
+        return currencies.stream()
+                .map(CURRENCY_MAPPER::convertToDto)
+                .collect(Collectors.toList());
     }
 }

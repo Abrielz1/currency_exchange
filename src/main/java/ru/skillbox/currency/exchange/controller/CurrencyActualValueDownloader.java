@@ -28,4 +28,11 @@ public class CurrencyActualValueDownloader {
 
         return downloaderService.manipulateStringXMLEntity(schedule.downloader());
     }
+
+    @GetMapping("/manual")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CurrencyDto> manualDownloaderExactCurrencyValueFromServer() {
+
+        return downloaderService.manipulateStringXMLEntity(downloaderService.downloader());
+    }
 }

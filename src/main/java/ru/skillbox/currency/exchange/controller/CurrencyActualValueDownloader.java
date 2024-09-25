@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skillbox.currency.exchange.configuration.Schedule;
 import ru.skillbox.currency.exchange.dto.CurrencyDto;
-import ru.skillbox.currency.exchange.service.DownloaderService;
+import ru.skillbox.currency.exchange.service.util.DownloaderService;
 import java.util.List;
 
 @Slf4j
@@ -26,7 +26,6 @@ public class CurrencyActualValueDownloader {
     @ResponseStatus(HttpStatus.OK)
     public List<CurrencyDto> downloaderExactCurrencyValueFromServer() {
 
-        return downloaderService.manipulateByteArray(schedule.downloader());
+        return downloaderService.manipulateStringXMLEntity(schedule.downloader());
     }
-
 }

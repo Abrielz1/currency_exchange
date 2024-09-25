@@ -13,7 +13,7 @@ public interface CurrencyMapper {
 
     CurrencyDto convertToDto(Currency currency);
 
-    Currency convertToEntity(CurrencyDto currencyDto);
+    Currency ToEntity(CurrencyDto currencyDto);
 
     CurrencyShortDto convertToShortDto(Currency currency);
 }

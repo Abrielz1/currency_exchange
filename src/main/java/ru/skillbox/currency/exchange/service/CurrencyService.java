@@ -9,7 +9,6 @@ import ru.skillbox.currency.exchange.dto.CurrencyDto;
 import ru.skillbox.currency.exchange.dto.CurrencyShortDto;
 import ru.skillbox.currency.exchange.entity.Currency;
 import ru.skillbox.currency.exchange.mapper.CurrencyMapper;
-import ru.skillbox.currency.exchange.mapper.CurrencyMapperManual;
 import ru.skillbox.currency.exchange.repository.CurrencyRepository;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +58,7 @@ public class CurrencyService {
         if (this.checkRecordInBD(currency).isPresent()) {
             inBDCurrency = this.checkRecordInBD(currency).get();
         } else {
-            inBDCurrency = CurrencyMapperManual.toEntity(currency);
+            inBDCurrency = CURRENCY_MAPPER.ToEntity(currency);
         }
 
         if (currency.getName() != null) {
@@ -90,7 +89,7 @@ public class CurrencyService {
     @Transactional
     public CurrencyDto create(CurrencyDto dto) {
         log.info("CurrencyService method create executed");
-        Currency toBd = repository.saveAndFlush(CurrencyMapperManual.toEntity(dto));
+        Currency toBd = repository.saveAndFlush(CURRENCY_MAPPER.ToEntity(dto));
 
         return  mapper.convertToDto(toBd);
     }

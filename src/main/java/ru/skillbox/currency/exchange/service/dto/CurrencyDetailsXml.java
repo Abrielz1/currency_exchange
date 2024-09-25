@@ -1,6 +1,7 @@
-package ru.skillbox.currency.exchange.service.util;
+package ru.skillbox.currency.exchange.service.dto;
 
 import lombok.NoArgsConstructor;
+import ru.skillbox.currency.exchange.service.util.StringToDoubleAdapter;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;

@@ -1,4 +1,4 @@
-package ru.skillbox.currency.exchange.service.util;
+package ru.skillbox.currency.exchange.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

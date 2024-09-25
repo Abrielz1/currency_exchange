@@ -20,6 +20,4 @@ public interface CurrencyRepository extends JpaRepository<Currency, Long> {
     Optional<Currency> findByCurrencyNameAndIsoCodeAndCharCode(@Param("name") String name,
                                                                @Param("iso_num_code") Long iso_num_code,
                                                                @Param("letter_iso_code") String letter_iso_code);
-
-    boolean existsByNameAndAndIsoNumCodeAndAndLetterIsoCode(String name, Long isoNumCode, String letterIsoCode);
 }

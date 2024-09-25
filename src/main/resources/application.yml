@@ -4,7 +4,6 @@ server:
 spring:
   liquibase:
     enabled: true
-    drop-first: true
     default-schema: public
     change-log: classpath:db/changelog_init.xml
 

@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DownloaderService {
+
     private final CurrencyRepository currencyRepository;
 
     private final CurrencyService currencyService;
@@ -50,8 +50,6 @@ public class DownloaderService {
     }
 
     private void byteaArrayToFile(byte[] bytesArray) {
-
-        System.out.println("myArray " + new String(bytesArray, StandardCharsets.UTF_8) + " myArray!");
 
        try
            (FileOutputStream fos = new FileOutputStream(PATH_TO_FILE)) {
@@ -96,8 +94,8 @@ public class DownloaderService {
         List<CurrencyDto> result = new ArrayList<>();
         for (CurrencyDto currency : listToUpdateCurrenciesInXML) {
             Currency currencyToCheck = CurrencyMapperManual.toEntity(currency);
-            if (currencyRepository.exists(Example.of(currencyToCheck))) {
 
+            if (currencyRepository.exists(Example.of(currencyToCheck))) {
                 result.add(currencyService.update(currency));
             } else {
                 result.add(currencyService.create(currency));
